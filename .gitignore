@@ -1,0 +1,24 @@
+# Vault files and local data must never be committed
+*.pvz
+*.pvz.tmp-*
+.pwvault/
+*.key
+*.pem
+
+# Build output for the submitted document
+docs/*.pdf
+docs/*.docx
+docs/diagrams/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# IDE settings
+.idea/
+*.iml
+.vscode/
+.DS_Store
