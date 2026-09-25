@@ -8,7 +8,6 @@ A command line application for storing the logins a user has on other websites. 
 protects the vault with a master password, and the whole vault is encrypted before it is
 written to disk. The file only contains a salt, a nonce and encrypted data, so a stolen
 copy of it does not reveal any passwords.
-
 This is the local counterpart of the web application built for ICS0027. The full design
 (architecture, cryptography and threat model) is in [`docs/DESIGN.md`](docs/DESIGN.md).
 
