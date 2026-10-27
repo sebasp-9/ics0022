@@ -1,75 +1,66 @@
 # Secure Password Manager
 
 Course project for **ICS0022 Secure Programming** (TalTech).
+Author: Sebastian Parra Pinto.
 
-Author: Sebastian Parra Pinto
+A terminal application that stores login names and passwords in one encrypted
+vault. Each command requires the master password. Passwords are never printed.
 
-A command line application for storing the logins a user has on other websites. The user
-protects the vault with a master password, and the whole vault is encrypted before it is
-written to disk. The file only contains a salt, a nonce and encrypted data, so a stolen
-copy of it does not reveal any passwords.
-This is the local counterpart of the web application built for ICS0027. The full design
-(architecture, cryptography and threat model) is in [`docs/DESIGN.md`](docs/DESIGN.md).
+## Run with Docker
 
-## Scope
+Install and start **Docker Desktop** (Windows/macOS), or **Docker Engine with
+Compose** (Linux). Use Linux containers. No Python installation is needed.
 
-**Features**
-- Creating a vault and setting a master password
-- Items: create, view, edit and delete saved logins (title, login name, password)
-- The whole vault encrypted with AES-256-GCM, using a key derived from the master password
-  with Argon2id
-- A generator for strong random passwords
-- Changing the master password
-- Copying a password to the clipboard, which is cleared after a short timeout
+Download and build the project:
 
-**Not included:** sharing, password history, sync between machines, browser integration and
-account recovery. A forgotten master password cannot be recovered, because the vault key is
-derived from it.
+```sh
+git clone https://github.com/sebasp-9/ics0022.git
+cd ics0022
+docker compose build
+```
 
-## Planned commands
+If you already have the project, open a terminal in its folder and run only
+the build command.
+
+Create a vault once:
+
+```sh
+docker compose run --rm vault init
+```
+
+Choose a master password of 12–128 characters and confirm it. Password prompts
+stay blank while you type. A forgotten master password cannot be recovered.
+
+## Commands
 
 | Command | Purpose |
 |---|---|
-| `pwvault init` | Create a vault and set the master password |
-| `pwvault add TITLE` | Add an item, asks for the password |
-| `pwvault get TITLE` | View one item, with `--clip` or `--show` |
-| `pwvault list` | List the item titles, never the passwords |
-| `pwvault update TITLE` | Edit an item |
-| `pwvault delete TITLE` | Delete an item |
-| `pwvault generate` | Make a strong random password, with `--length` |
-| `pwvault change-master` | Change the master password |
-| `pwvault info` | Vault path, number of items, Argon2 settings |
+| `docker compose run --rm vault add "Email"` | Save a login name and password |
+| `docker compose run --rm vault list` | List saved titles |
+| `docker compose run --rm vault get "Email"` | Show the login name; password stays hidden |
+| `docker compose run --rm vault update "Email"` | Change the login name or password |
+| `docker compose run --rm vault delete "Email"` | Delete after typing `yes` to confirm |
+| `docker compose run --rm vault --help` | Show help |
 
-`--vault PATH` uses a vault file other than `~/.pwvault/vault.pvz`.
+For updates, press Enter to keep a field unchanged. There is no `--show` option
+or clipboard retrieval in checkpoint 2.
 
-Exit codes: `0` success, `1` bad input, `2` wrong master password, `3` vault missing or
-modified, `4` no such item.
+Docker removes each container after the command, but keeps the encrypted vault
+in the `vault-data` volume. Keep the same project folder name to reuse it.
+Deleting that volume deletes the vault. Run one command at a time.
 
-The master password is never accepted as a command argument or an environment variable,
-because anything on the command line is visible in `ps` and is written to the shell
-history. It is only ever typed at a prompt with echo turned off.
+## Checkpoint 2
 
-## Running locally (planned)
+- **Storage and encryption:** the whole vault uses AES-256-GCM, with an
+  Argon2id key derived from the master password and a fresh nonce per save.
+- **Authentication:** wrong passwords or modified ciphertext fail verification
+  before any saved items are used.
+- **Interface:** passwords use hidden prompts and never appear in output.
+- **Submission:** include the source, Dockerfile, Compose file and
+  [progress note](docs/PROGRESS.md).
 
-The code is added in Checkpoint 2. From then on, the application will be started with these
-steps. It will need Python 3.12 or newer, on Linux or macOS.
+The Docker image built successfully, and all 31 CLI checks passed inside the
+Linux container, including encryption, authentication and file permissions.
 
-1. Clone the repository and create a virtual environment: `python -m venv .venv`
-2. Activate it: `source .venv/bin/activate`
-3. Install the libraries: `pip install -r requirements.txt`
-4. Install the application: `pip install -e .`
-5. Create a vault: `pwvault init`
-6. Run a command, for example `pwvault list`, or `python -m pwvault --help` without
-   installing
-
-The vault file and its directory are created with permissions that only allow the owner to
-read them, and the application refuses to open a vault whose permissions are wider than
-that.
-
-## Status
-
-| Checkpoint | Status |
-|---|---|
-| 1: Design document and repository with README | Done |
-| 2: Key derivation, encryption, storage, and the first commands | Planned |
-| 3: Remaining commands, changing the master password, tests | Planned |
+Password generation, clipboard support and master-password changes remain
+planned for checkpoint 3. Further details are in [the design](docs/DESIGN.md).

@@ -1,0 +1,10 @@
+services:
+  vault:
+    build: .
+    stdin_open: true
+    tty: true
+    volumes:
+      - vault-data:/home/app/.pwvault
+
+volumes:
+  vault-data:

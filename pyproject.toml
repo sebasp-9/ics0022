@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pwvault"
+version = "0.2.0"
+description = "A small encrypted command-line password vault for ICS0022."
+requires-python = ">=3.12"
+dependencies = [
+    "argon2-cffi==25.1.0",
+    "cryptography==48.0.1",
+]
+
+[project.scripts]
+pwvault = "pwvault.cli:main"
+
+[tool.setuptools]
+packages = ["pwvault"]

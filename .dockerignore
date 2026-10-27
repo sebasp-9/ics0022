@@ -1,0 +1,6 @@
+# Only send the application and its package settings to Docker.
+*
+!Dockerfile
+!pyproject.toml
+!pwvault/
+!pwvault/*.py

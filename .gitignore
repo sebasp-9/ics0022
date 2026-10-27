@@ -22,3 +22,14 @@ venv/
 *.iml
 .vscode/
 .DS_Store
+
+work/
+*.egg-info/
+build/
+dist/
+.pwvault-*
+
+# Local environment files
+.env
+.env.*
+!.env.example
