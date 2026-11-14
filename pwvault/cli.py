@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 import warnings
 
-from . import audit, locking, memory, storage, users
+from . import audit, clipboard, locking, memory, storage, users
 from .errors import VaultError
 
 DEFAULT_VAULT = Path.home() / ".pwvault" / "vault.pvz"
@@ -57,6 +57,9 @@ def parser():
             ("delete", "Delete a saved login after confirmation.")):
         subcommand = commands.add_parser(command, help=help_text)
         subcommand.add_argument("title", metavar="TITLE")
+        if command == "get":
+            subcommand.add_argument("--copy", action="store_true",
+                                    help="Copy the password for 20 seconds on a local desktop.")
     return command_line
 
 
@@ -113,6 +116,8 @@ def operate(args, path, key, salt, items):
         print("Title: " + title)
         print("Login name: " + items[title]["username"])
         print("Password: [hidden]")
+        if args.copy:
+            clipboard.copy_password(items[title]["password"])
     elif args.command == "update":
         username = input("New login name (Enter to keep current): ")
         if username:

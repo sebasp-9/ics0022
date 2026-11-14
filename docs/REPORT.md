@@ -11,21 +11,23 @@ Course project report
 
 This project implements an offline command-line password manager. Its purpose is to store login names and passwords securely, require a master password before access, and prevent unsafe input or file access. It applies the course topics of cryptography, validation, file handling, access control, memory handling and secure errors. The required report structure and project scope come from the supplied project instructions [1].
 
-The application supports creating a vault and adding, listing, viewing, updating and deleting saved logins. Password input is hidden. The view command prints the title and login name but never the saved password. There is no password-reveal command, network service, browser interface, synchronization or account recovery.
+The application supports creating a vault and adding, listing, viewing, updating and deleting saved logins. Password input is hidden. The view command prints the title and login name but never the saved password. Optional get --copy retrieves a password through the local desktop clipboard. There is no cleartext-display command, network service, browser interface, synchronization or account recovery.
 
-The intended environment is Docker with Linux containers. One OS user owns the vault and all its records. The threat model includes a stolen or modified vault file, malformed input, another OS user, path redirection and interrupted operations. Root, a compromised operating system, keyloggers and malicious processes already running as the vault owner remain outside the protection model.
+Docker/Linux is the storage and ownership test environment. Clipboard retrieval runs on a local desktop and was checked on Windows. One OS user owns the vault and its records. Threats include a stolen or modified vault, malformed input, another OS user, path redirection and interrupted operations. Root, a compromised OS, keyloggers and malicious owner processes remain outside the protection model.
 
-The implementation and test evidence are complete for the stated prototype scope. A literal guarantee that every secret copy is immediately erased is not achieved by the current Python design. This limitation is analyzed explicitly rather than described as a completed requirement.
+The Checkpoint 3 prototype includes encrypted record operations, clipboard retrieval, validation, structured logging, ownership checks and a passing test suite. Python cannot guarantee immediate erasure of every secret copy. This memory-handling limitation is documented explicitly rather than claimed as solved.
 
 # 2 Implementation
 
-The application uses Python 3.12 with pinned argon2-cffi and cryptography dependencies. Commands are short-lived: each command authenticates, performs one operation and exits. The modules keep the security boundaries small enough to review.
+The application uses Python 3.12 with pinned argon2-cffi, cryptography and pyperclip dependencies. Each command authenticates, performs one operation and exits. The modules keep the security boundaries small enough to review.
 
 ## 2.1 Program flow
 
 The installed entry point first enables Linux process protections. It then parses the command, checks the vault directory and holds an OS file lock. The lock prevents a second cooperating command from reading an old vault and overwriting newer changes. It covers input prompts as well as saving and is released on normal exit, exceptions and process termination.
 
 The CLI delegates validation and vault operations to users.py. The crypto.py module derives keys and authenticates encrypted data. The storage.py module handles ownership, permissions, file reads and replacement. The audit.py module records fixed event metadata. The memory.py module cleans owned buffers and enables process protections. The locking.py module serializes commands using a stable private lock file.
+
+clipboard.py implements optional retrieval through pyperclip [6]. After authentication, get --copy copies the password without printing it, waits 20 seconds and clears matching clipboard text. Ctrl+C also runs cleanup; newer copied text is preserved. Missing backends and cleanup failures produce controlled errors. Docker has no desktop clipboard; this feature runs locally.
 
 ## 2.2 Authentication and encrypted storage
 
@@ -67,7 +69,7 @@ The security review combines positive functional checks with negative cases and 
 
 ## 3.1 Test results
 
-The Docker image built successfully. The final suite ran 50 tests as the normal non-root user: 49 passed and the root-only ownership case was skipped. Running the suite as root passed all 50 tests, including child processes with UIDs 10001 and 10002. Windows passed 39 tests and skipped 11 environment-specific cases. Exact output is saved with the source.
+The Docker image built successfully. The suite ran 59 tests as the normal non-root user: 58 passed and the root-only ownership case was skipped. Running as root passed all 59, including child processes with UIDs 10001 and 10002. Windows passed 48 and skipped 11 platform-specific cases. Exact output is in docs/test-results/.
 
 | Area | Verified behavior |
 |---|---|
@@ -78,24 +80,27 @@ The Docker image built successfully. The final suite ran 50 tests as the normal 
 | Failure paths | Failed save preserves the vault; temporary files removed; log/KDF errors produce controlled messages |
 | Memory and locking | Owned-buffer cleanup on success/failure/cancellation; Linux process controls; a second command cannot enter while locked |
 | Actual terminal | Password echo disabled; full CRUD flow across CLI processes; Ctrl+C preserves the vault and releases the command |
+| Clipboard | Authentication required; no secret output/logging; timeout and cancellation cleanup; newer contents preserved; controlled backend failures |
 
-The terminal tests use real Linux pseudo-terminals and the actual CLI without mocking getpass. A separate Docker check wrote a fictional entry in a fresh volume and reopened it in a second container. It verified persistence, encrypted contents and mode 0600. Only that newly created verification volume was removed afterward; existing user data was not used.
+Linux pseudo-terminal tests run the actual CLI without mocking getpass. A separate disposable Docker volume verified cross-container persistence, encrypted contents and mode 0600. Existing user data was not used.
+
+A temporary-vault check used the real Windows clipboard and full 20-second wait. Timeout and Ctrl+C cleared the password; vault bytes were unchanged and output/logs contained no secrets. Master-password input was fictional; Linux terminal tests cover hidden prompts.
 
 ## 3.2 Findings and corrections
 
-Validation tests found unsuitable master-password values and duplicate JSON names. Both were fixed. Linux testing found a temporary-file cleanup error after rename; it was corrected and the Linux suites were rerun.
+Tests found unsuitable master-password values, duplicate JSON names and a Linux temporary-file cleanup error after rename. These were corrected and the Linux suites rerun.
 
-The command lock prevents accidental concurrent updates. File ownership is checked at storage access, and encryption authentication happens before record use. Two-UID testing verifies that another OS user cannot read or replace the owner's test vault.
-
-An additional dependency scan reported three unique advisories for cryptography 48.0.1, affecting certificate and PKCS7 features unused by this app. The pin was updated to 50.0.2. The five checked public runtime packages then had no reported known vulnerabilities. DEPENDENCIES.md records the scope and results.
+An additional dependency scan reported three unique advisories for cryptography 48.0.1, affecting certificate and PKCS7 features unused by this app. The pin was updated to 50.0.2. The six checked public runtime packages, including pyperclip, then had no reported known vulnerabilities. TESTS.md records the scope and results.
 
 ## 3.3 Residual risks and requirement coverage
 
-Encrypted storage, master-password access, validation, hidden output, structured events, ownership checks and the required report sections are implemented and tested. Memory handling includes owned-buffer wiping and Linux process hardening, but complete erasure of immutable or native copies remains unproven. This report does not claim full satisfaction of that literal requirement.
+Encrypted storage, authentication, validation, hidden output, events and OS-user ownership are tested. Owned buffers are wiped, but Python/native copies may remain; immediate erasure is not guaranteed.
 
-The program does not detect rollback to an older valid vault. Deleting a record removes it from the current encrypted payload; it does not erase backups or guarantee deletion from old filesystem blocks. There is no recovery for a forgotten master password, automatic log rotation or secure sharing. The owner should keep protected backups and archive the metadata log when needed.
+Clipboard retrieval never prints passwords. History/sync and other apps may retain them; forced termination can prevent cleanup. Section 2.2 explains Argon2id/AES-GCM authentication without a separate hash verifier.
 
-A shared Docker volume under one UID represents one OS identity. It must not be presented as a separate vault account for every person using the computer. Filesystem guarantees can also differ on network filesystems; the tested environment is the local Linux filesystem provided by Docker Desktop.
+Older valid vaults can be restored undetected. Deletion does not erase backups or old disk blocks. There is no forgotten-password recovery, automatic log rotation or sharing. Keep protected backups.
+
+One Docker UID is one identity. Tests use local Linux filesystems; network filesystems may differ.
 
 # 4 Conclusion
 
@@ -107,11 +112,11 @@ The most important design challenge is the tension between simple Python code an
 
 ## 4.1 AI tools
 
-AI tools were used for requirements review, code, automated tests and documentation. I ran the manual demo and checked the password-manager flow. REVIEW.md contains the checklist and remaining work.
+AI tools were used for requirements review, code, automated tests and documentation. I ran the manual demo and checked the password-manager flow. TESTS.md contains the checks and remaining work.
 
 # References
 
-[1] Ali Ghasempour. ICS0022 Secure Programming Project Instructions, autumn 2026/2027. Supplied course PDF, sections 1.3, 4.2 and 4.4.3. Supplemented by the supplied Checkpoint 3 checklist and ICS0022 lecture collection: S02, S03, S04, S07, S08 and S09. The local source map is recorded in COURSE_REVIEW.md.
+[1] Ali Ghasempour. ICS0022 Secure Programming Project Instructions, autumn 2026/2027. Supplied course PDF, sections 1.3, 4.2 and 4.4.3. Supplemented by the supplied Checkpoint 3 checklist and ICS0022 lecture collection: S02, S03, S04, S07, S08 and S09. Source-local lecture IDs refer to the supplied course master PDF.
 
 [2] argon2-cffi. API Reference, version 25.1.0. https://argon2-cffi.readthedocs.io/en/stable/api.html.
 
@@ -120,3 +125,5 @@ AI tools were used for requirements review, code, automated tests and documentat
 [4] Linux man-pages. PR_SET_DUMPABLE. https://man7.org/linux/man-pages/man2/PR_SET_DUMPABLE.2const.html.
 
 [5] TalTech School of Information Technologies. Guidelines for writing and formatting a thesis, 2025 edition. Formatting principles adapted for this course report; thesis-only declarations and publication licences are not asserted. https://haldus.taltech.ee/sites/default/files/2025-08/School%20of%20IT_Guidelines%20for%20writing%20and%20formatting%20a%20thesis.pdf.
+
+[6] Al Sweigart. Pyperclip 1.11.0, desktop clipboard copy and paste library. https://pypi.org/project/pyperclip/.

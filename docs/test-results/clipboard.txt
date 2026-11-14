@@ -1,0 +1,10 @@
+Windows desktop verification with a disposable fictional vault.
+Command: .\.venv\Scripts\python.exe ../checkpoint3_ready/work/verify_clipboard.py
+
+PASS: authenticated retrieval reached the real Windows clipboard.
+PASS: the actual 20-second wait cleared the password; Ctrl+C cleared it too.
+PASS: no password in output or logs; encrypted vault unchanged.
+The master-password prompt used fictional test input; Linux PTY tests cover hidden prompts.
+
+Headless Docker verification with a disposable fictional vault:
+PASS: real headless Docker backend returns a controlled error, exposes no password and leaves the vault unchanged.

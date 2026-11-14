@@ -1,5 +1,4 @@
-Reviewed checkout; cryptography 50.0.2.
-No saved-vault volume mounted.
+Linux tests in disposable containers; no saved-vault volume mounted.
 
 Command: docker run --rm --entrypoint python ics0022-vault -m unittest discover -s tests -v
 
@@ -9,11 +8,18 @@ test_log_hardlink_is_rejected (test_audit.AuditTests.test_log_hardlink_is_reject
 test_log_permissions_are_private_and_public_log_is_refused (test_audit.AuditTests.test_log_permissions_are_private_and_public_log_is_refused) ... ok
 test_success_failure_and_cancellation (test_audit.AuditTests.test_success_failure_and_cancellation) ... ok
 test_untrusted_event_fields_are_rejected (test_audit.AuditTests.test_untrusted_event_fields_are_rejected) ... ok
+test_clear_failure_is_reported_without_exposing_the_password (test_clipboard.ClipboardTests.test_clear_failure_is_reported_without_exposing_the_password) ... ok
+test_ctrl_c_still_clears_the_password (test_clipboard.ClipboardTests.test_ctrl_c_still_clears_the_password) ... ok
+test_failed_round_trip_does_not_claim_success_or_erase_other_text (test_clipboard.ClipboardTests.test_failed_round_trip_does_not_claim_success_or_erase_other_text) ... ok
+test_newer_clipboard_content_is_preserved (test_clipboard.ClipboardTests.test_newer_clipboard_content_is_preserved) ... ok
+test_password_is_available_during_wait_then_cleared_without_printing (test_clipboard.ClipboardTests.test_password_is_available_during_wait_then_cleared_without_printing) ... ok
+test_unavailable_backend_does_not_leak_details_or_claim_success (test_clipboard.ClipboardTests.test_unavailable_backend_does_not_leak_details_or_claim_success) ... ok
 test_exception_releases_lock (test_locking.LockTests.test_exception_releases_lock) ... ok
 test_lock_inode_is_reused (test_locking.LockTests.test_lock_inode_is_reused) ... ok
 test_second_command_is_rejected_before_password_prompt (test_locking.LockTests.test_second_command_is_rejected_before_password_prompt) ... ok
 test_authentication_log_failure_after_unlock_still_cleans (test_memory.MemoryTests.test_authentication_log_failure_after_unlock_still_cleans) ... ok
 test_cli_cleans_on_success_error_and_cancellation (test_memory.MemoryTests.test_cli_cleans_on_success_error_and_cancellation) ... ok
+test_clipboard_cancellation_also_cleans_key_and_record_references (test_memory.MemoryTests.test_clipboard_cancellation_also_cleans_key_and_record_references) ... ok
 test_creation_key_is_cleaned_on_success_and_failure (test_memory.MemoryTests.test_creation_key_is_cleaned_on_success_and_failure) ... ok
 test_encryption_plaintext_buffer_is_cleaned_even_on_failure (test_memory.MemoryTests.test_encryption_plaintext_buffer_is_cleaned_even_on_failure) ... ok
 test_hardening_failure_stops_before_any_command (test_memory.MemoryTests.test_hardening_failure_stops_before_any_command) ... ok
@@ -36,6 +42,8 @@ test_schema_rejects_invalid_records (test_security.ValidationTests.test_schema_r
 test_shell_and_format_syntax_remain_literal_data (test_security.ValidationTests.test_shell_and_format_syntax_remain_literal_data) ... ok
 test_text_boundaries_and_unicode (test_security.ValidationTests.test_text_boundaries_and_unicode) ... ok
 test_cli_add_list_get_update_delete (test_security.VaultTests.test_cli_add_list_get_update_delete) ... ok
+test_clipboard_failure_and_cancellation_leave_the_vault_usable (test_security.VaultTests.test_clipboard_failure_and_cancellation_leave_the_vault_usable) ... ok
+test_clipboard_retrieval_requires_authentication_and_stays_out_of_logs (test_security.VaultTests.test_clipboard_retrieval_requires_authentication_and_stays_out_of_logs) ... ok
 test_every_existing_vault_command_requires_authentication (test_security.VaultTests.test_every_existing_vault_command_requires_authentication) ... ok
 test_failed_replace_preserves_vault_and_removes_tempfile (test_security.VaultTests.test_failed_replace_preserves_vault_and_removes_tempfile) ... ok
 test_initialization_never_overwrites_existing_vault (test_security.VaultTests.test_initialization_never_overwrites_existing_vault) ... ok
@@ -55,7 +63,7 @@ test_ctrl_c_restores_prompt_and_preserves_vault (test_terminal.TerminalTests.tes
 test_real_prompts_and_persistence_between_cli_processes (test_terminal.TerminalTests.test_real_prompts_and_persistence_between_cli_processes) ... ok
 
 ----------------------------------------------------------------------
-Ran 50 tests in 4.759s
+Ran 59 tests in 6.619s
 
 OK (skipped=1)
 
@@ -67,11 +75,18 @@ test_log_hardlink_is_rejected (test_audit.AuditTests.test_log_hardlink_is_reject
 test_log_permissions_are_private_and_public_log_is_refused (test_audit.AuditTests.test_log_permissions_are_private_and_public_log_is_refused) ... ok
 test_success_failure_and_cancellation (test_audit.AuditTests.test_success_failure_and_cancellation) ... ok
 test_untrusted_event_fields_are_rejected (test_audit.AuditTests.test_untrusted_event_fields_are_rejected) ... ok
+test_clear_failure_is_reported_without_exposing_the_password (test_clipboard.ClipboardTests.test_clear_failure_is_reported_without_exposing_the_password) ... ok
+test_ctrl_c_still_clears_the_password (test_clipboard.ClipboardTests.test_ctrl_c_still_clears_the_password) ... ok
+test_failed_round_trip_does_not_claim_success_or_erase_other_text (test_clipboard.ClipboardTests.test_failed_round_trip_does_not_claim_success_or_erase_other_text) ... ok
+test_newer_clipboard_content_is_preserved (test_clipboard.ClipboardTests.test_newer_clipboard_content_is_preserved) ... ok
+test_password_is_available_during_wait_then_cleared_without_printing (test_clipboard.ClipboardTests.test_password_is_available_during_wait_then_cleared_without_printing) ... ok
+test_unavailable_backend_does_not_leak_details_or_claim_success (test_clipboard.ClipboardTests.test_unavailable_backend_does_not_leak_details_or_claim_success) ... ok
 test_exception_releases_lock (test_locking.LockTests.test_exception_releases_lock) ... ok
 test_lock_inode_is_reused (test_locking.LockTests.test_lock_inode_is_reused) ... ok
 test_second_command_is_rejected_before_password_prompt (test_locking.LockTests.test_second_command_is_rejected_before_password_prompt) ... ok
 test_authentication_log_failure_after_unlock_still_cleans (test_memory.MemoryTests.test_authentication_log_failure_after_unlock_still_cleans) ... ok
 test_cli_cleans_on_success_error_and_cancellation (test_memory.MemoryTests.test_cli_cleans_on_success_error_and_cancellation) ... ok
+test_clipboard_cancellation_also_cleans_key_and_record_references (test_memory.MemoryTests.test_clipboard_cancellation_also_cleans_key_and_record_references) ... ok
 test_creation_key_is_cleaned_on_success_and_failure (test_memory.MemoryTests.test_creation_key_is_cleaned_on_success_and_failure) ... ok
 test_encryption_plaintext_buffer_is_cleaned_even_on_failure (test_memory.MemoryTests.test_encryption_plaintext_buffer_is_cleaned_even_on_failure) ... ok
 test_hardening_failure_stops_before_any_command (test_memory.MemoryTests.test_hardening_failure_stops_before_any_command) ... ok
@@ -94,6 +109,8 @@ test_schema_rejects_invalid_records (test_security.ValidationTests.test_schema_r
 test_shell_and_format_syntax_remain_literal_data (test_security.ValidationTests.test_shell_and_format_syntax_remain_literal_data) ... ok
 test_text_boundaries_and_unicode (test_security.ValidationTests.test_text_boundaries_and_unicode) ... ok
 test_cli_add_list_get_update_delete (test_security.VaultTests.test_cli_add_list_get_update_delete) ... ok
+test_clipboard_failure_and_cancellation_leave_the_vault_usable (test_security.VaultTests.test_clipboard_failure_and_cancellation_leave_the_vault_usable) ... ok
+test_clipboard_retrieval_requires_authentication_and_stays_out_of_logs (test_security.VaultTests.test_clipboard_retrieval_requires_authentication_and_stays_out_of_logs) ... ok
 test_every_existing_vault_command_requires_authentication (test_security.VaultTests.test_every_existing_vault_command_requires_authentication) ... ok
 test_failed_replace_preserves_vault_and_removes_tempfile (test_security.VaultTests.test_failed_replace_preserves_vault_and_removes_tempfile) ... ok
 test_initialization_never_overwrites_existing_vault (test_security.VaultTests.test_initialization_never_overwrites_existing_vault) ... ok
@@ -113,6 +130,6 @@ test_ctrl_c_restores_prompt_and_preserves_vault (test_terminal.TerminalTests.tes
 test_real_prompts_and_persistence_between_cli_processes (test_terminal.TerminalTests.test_real_prompts_and_persistence_between_cli_processes) ... ok
 
 ----------------------------------------------------------------------
-Ran 50 tests in 5.342s
+Ran 59 tests in 7.250s
 
 OK

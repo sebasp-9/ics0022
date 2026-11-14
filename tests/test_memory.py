@@ -145,6 +145,21 @@ class MemoryTests(unittest.TestCase):
             self.assertEqual(cli.main(["--vault", str(self.path), "list"]), 3)
         self.assertEqual(key, bytearray(32))
 
+    def test_clipboard_cancellation_also_cleans_key_and_record_references(self):
+        self.path.write_bytes(b"dummy")
+        self.path.chmod(0o600)
+        key = bytearray(b"k" * 32)
+        entry = {"username": "alice", "password": "fictional clipboard secret"}
+        items = {"Email": entry}
+        with patch("pwvault.cli.users.open_vault", return_value=(key, b"s" * 16, items)), \
+                patch("pwvault.cli.password_prompt", return_value=MASTER), \
+                patch("pwvault.cli.clipboard.copy_password", side_effect=KeyboardInterrupt), \
+                redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            self.assertEqual(cli.main(["--vault", str(self.path), "get", "Email", "--copy"]), 1)
+        self.assertEqual(key, bytearray(32))
+        self.assertEqual(items, {})
+        self.assertEqual(entry, {})
+
     @unittest.skipUnless(sys.platform == "linux", "Requires Linux process controls")
     def test_linux_disables_core_dumps_and_process_dumpability(self):
         code = ("from pwvault.memory import harden_process; import ctypes,resource; "

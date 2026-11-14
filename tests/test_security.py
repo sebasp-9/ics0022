@@ -182,6 +182,32 @@ class VaultTests(unittest.TestCase):
                 self.assertNotIn("Traceback", errors)
                 self.assertEqual(self.path.read_bytes(), before)
 
+    def test_clipboard_retrieval_requires_authentication_and_stays_out_of_logs(self):
+        self.assertEqual(self.command("add", "Email", passwords=(MASTER, SECRET, SECRET),
+                                      inputs=("alice",))[0], 0)
+        before = self.path.read_bytes()
+        with patch("pwvault.cli.clipboard.copy_password") as copy:
+            self.assertEqual(self.command("get", "Email", "--copy",
+                                          passwords=("Wrong password!",))[0], 2)
+            copy.assert_not_called()
+            self.assertEqual(self.command("get", "Email", passwords=(MASTER,))[0], 0)
+            copy.assert_not_called()
+            self.assertEqual(self.command("get", "Email", "--copy", passwords=(MASTER,))[0], 0)
+            copy.assert_called_once_with(SECRET)
+        self.assertEqual(self.path.read_bytes(), before)
+        self.assertNotIn(SECRET, (self.directory / "audit.jsonl").read_text())
+
+    def test_clipboard_failure_and_cancellation_leave_the_vault_usable(self):
+        self.assertEqual(self.command("add", "Email", passwords=(MASTER, SECRET, SECRET),
+                                      inputs=("alice",))[0], 0)
+        before = self.path.read_bytes()
+        for failure, expected in ((VaultError("Clipboard unavailable.", 3), 3),
+                                  (KeyboardInterrupt(), 1)):
+            with patch("pwvault.cli.clipboard.copy_password", side_effect=failure):
+                self.assertEqual(self.command("get", "Email", "--copy", passwords=(MASTER,))[0], expected)
+            self.assertEqual(self.path.read_bytes(), before)
+            self.assertEqual(self.command("list", passwords=(MASTER,))[0], 0)
+
     def test_invalid_title_rejected_without_prompt_or_write(self):
         before = self.path.read_bytes()
         for title in ("", "x" * 101, "\x1b[31m", "line\nbreak"):
