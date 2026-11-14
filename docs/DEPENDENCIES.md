@@ -1,6 +1,6 @@
 # Dependency review
 
-Checked 14 November 2026 with pip-audit 2.10.1 against the public Python
+Checked with pip-audit 2.10.1 against the public Python
 runtime package versions collected from the built application image.
 
 The original cryptography 48.0.1 pin had three unique reported advisories:
@@ -15,7 +15,7 @@ Exact versions/results are in dependency-audit.json. The application suites
 were rerun after the upgrade; the encrypted vault format is unchanged.
 
 The scan used an isolated disposable container. It did not alter the app
-image or install audit tools into the student's virtual environment.
+image or install audit tools into the project virtual environment.
 It excludes the local project, pip installer and operating-system packages.
 A clean advisory scan is not proof that no vulnerabilities exist.
 

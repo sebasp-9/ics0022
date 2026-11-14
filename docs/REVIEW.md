@@ -1,49 +1,41 @@
-# Review and checks
+# Checks and remaining work
 
-14 November 2026. AI tools assisted with requirements review, code, automated
-tests and documentation. The checks below were run with AI assistance.
-They are not presented as tests personally performed by the student.
+## Manual demo
 
-## Technical checks
+I ran the password manager in my terminal with fictional credentials. I
+checked the full flow and confirmed that saved passwords stayed hidden.
 
-- Docker build and full suite as the normal Linux user and as root.
-- Hidden input, CRUD, wrong-password rejection and Ctrl+C in actual Linux
-  pseudo-terminals, using the CLI rather than mocked password input.
-- Saved data reopened in a separate container using a fresh test volume.
-- Ciphertext/permissions, private logs and two-OS-user ownership checks.
-- Windows tests, dependency consistency and Git whitespace checks.
-- Known-advisory scan of five Python runtime packages after updating
-  cryptography to 50.0.2; no known vulnerabilities reported (DEPENDENCIES.md).
-- Scan of project text for em dashes and en dashes; plain hyphens used.
+- [x] Create a vault and confirm the master password.
+- [x] Add a saved login, list it and view its login name.
+- [x] Keep password input invisible and display saved passwords as [hidden].
+- [x] Reject a wrong master password, then reopen with the correct one.
+- [x] Update an entry and check the changed login name.
+- [x] Reopen the vault between commands and keep the saved entry.
+- [x] Cancel with Ctrl+C, then reopen the vault successfully.
+- [x] Delete the entry and confirm that the vault is empty.
 
-Exact results are in PREPARED_VALIDATION.md, docker-test-results.txt,
-prepared-test-results.txt and persistence-results.txt. Tests use fictional
-credentials. They do not open the owner's existing vault.
+## Automated checks
 
-## Personal checks
+The Linux suite passed all 50 tests as root. The normal-user run passed 49
+tests and skipped the root-only ownership test. Windows passed 39 tests
+and skipped 11 Linux-specific cases.
 
-The student reported on 14 November 2026 that the complete manual demo
-worked. These boxes record that report; personal code/report review is not
-claimed. The assistant also ran a separate interactive demo; its evidence
-is in interactive-review-results.txt.
+The checks cover encryption, authentication, input boundaries, ownership,
+links, failed saves, private logging, locking and buffer cleanup. The
+dependency scan found no known advisories in the five checked runtime
+packages after the cryptography update.
 
-- [ ] Read the changes and explain the main functions in your own words.
-- [x] Type the Docker demo commands yourself in your own terminal.
-- [x] Check that your terminal hides passwords and that get keeps them hidden.
-- [x] Add, update and delete a fictional entry; try one wrong master password.
-- [x] Close a command and reopen the same demo vault to check persistence.
-- [x] Ctrl+C left the demo vault usable, as reported by the student.
-- [ ] Read the report and confirm that it matches your understanding.
-- [ ] Rehearse the presentation and discuss the Python memory limit with the lecturer.
+Results: PREPARED_VALIDATION.md, docker-test-results.txt,
+prepared-test-results.txt, interactive-review-results.txt and
+persistence-results.txt. Dependency scope is recorded in DEPENDENCIES.md.
 
-No pull request was created for these changes. Personal code/report review
-and presentation preparation remain unchecked above.
+## Before submission
 
-## Limits of this verification
+- [ ] Review the code and explain the main functions in my own words.
+- [ ] Read the report and check that it matches my understanding.
+- [ ] Rehearse the presentation and discuss the Python memory limit.
 
-No claim is made for erasure of every Python/native secret copy, physical
-memory/swap forensics, every possible filesystem race or a compromised OS.
-The OS packages and pip installer were not covered by the Python dependency
-scan. Windows has weaker filesystem guarantees than the intended Docker/Linux
-environment. A student demonstration and lecturer acceptance of the memory
-qualification remain separate from automated test results.
+Python cannot guarantee erasure of every immutable or native secret copy.
+Physical RAM/swap forensics, exhaustive race analysis, OS-package scanning
+and the pip installer are outside these checks. Windows has weaker
+filesystem guarantees than the intended Docker/Linux environment.

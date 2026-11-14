@@ -1,5 +1,4 @@
 {
-  "checked_date": "2026-11-14",
   "scope": "Public third-party Python runtime packages in the built image; excludes local project, pip installer and OS packages",
   "packages": [
     [

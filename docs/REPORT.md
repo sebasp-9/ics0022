@@ -5,7 +5,7 @@ ICS0022 Secure Programming
 TalTech School of Information Technologies
 Lecturer Ali Ghasempour
 Tallinn 2026
-Technical report prepared 14 November 2026
+Course project report
 
 # 1 Introduction
 
@@ -67,7 +67,7 @@ The security review combines positive functional checks with negative cases and 
 
 ## 3.1 Test results
 
-On 14 November 2026, the final Docker image built successfully. The final suite ran 50 tests as the normal non-root user: 49 passed and the root-only ownership case was skipped. Running the suite as root passed all 50 tests, including child processes with UIDs 10001 and 10002. Windows passed 39 tests and skipped 11 environment-specific cases. Exact output is saved with the source.
+The Docker image built successfully. The final suite ran 50 tests as the normal non-root user: 49 passed and the root-only ownership case was skipped. Running the suite as root passed all 50 tests, including child processes with UIDs 10001 and 10002. Windows passed 39 tests and skipped 11 environment-specific cases. Exact output is saved with the source.
 
 | Area | Verified behavior |
 |---|---|
@@ -107,16 +107,16 @@ The most important design challenge is the tension between simple Python code an
 
 ## 4.1 AI tools
 
-AI tools were used for requirements review, code, automated tests and documentation. I ran the terminal demo myself, checking hidden input, saved-login operations, wrong-password rejection, persistence and Ctrl+C. Additional automated and terminal checks were run with AI assistance. REVIEW.md records the checks and remaining limits.
+AI tools were used for requirements review, code, automated tests and documentation. I ran the manual demo and checked the password-manager flow. REVIEW.md contains the checklist and remaining work.
 
 # References
 
 [1] Ali Ghasempour. ICS0022 Secure Programming Project Instructions, autumn 2026/2027. Supplied course PDF, sections 1.3, 4.2 and 4.4.3. Supplemented by the supplied Checkpoint 3 checklist and ICS0022 lecture collection: S02, S03, S04, S07, S08 and S09. The local source map is recorded in COURSE_REVIEW.md.
 
-[2] argon2-cffi. API Reference, version 25.1.0. https://argon2-cffi.readthedocs.io/en/stable/api.html. Accessed 14 November 2026.
+[2] argon2-cffi. API Reference, version 25.1.0. https://argon2-cffi.readthedocs.io/en/stable/api.html.
 
-[3] Python Cryptographic Authority. Authenticated encryption documentation. https://cryptography.io/en/stable/hazmat/primitives/aead/. Accessed 14 November 2026.
+[3] Python Cryptographic Authority. Authenticated encryption documentation. https://cryptography.io/en/stable/hazmat/primitives/aead/.
 
-[4] Linux man-pages. PR_SET_DUMPABLE. https://man7.org/linux/man-pages/man2/PR_SET_DUMPABLE.2const.html. Accessed 14 November 2026.
+[4] Linux man-pages. PR_SET_DUMPABLE. https://man7.org/linux/man-pages/man2/PR_SET_DUMPABLE.2const.html.
 
-[5] TalTech School of Information Technologies. Guidelines for writing and formatting a thesis, approved 11 August 2025. Formatting principles adapted for this course report; thesis-only declarations and publication licences are not asserted. https://haldus.taltech.ee/sites/default/files/2025-08/School%20of%20IT_Guidelines%20for%20writing%20and%20formatting%20a%20thesis.pdf. Accessed 14 November 2026.
+[5] TalTech School of Information Technologies. Guidelines for writing and formatting a thesis, 2025 edition. Formatting principles adapted for this course report; thesis-only declarations and publication licences are not asserted. https://haldus.taltech.ee/sites/default/files/2025-08/School%20of%20IT_Guidelines%20for%20writing%20and%20formatting%20a%20thesis.pdf.

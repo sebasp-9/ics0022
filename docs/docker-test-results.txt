@@ -1,4 +1,4 @@
-Reviewed checkout, 14 November 2026; cryptography 50.0.2.
+Reviewed checkout; cryptography 50.0.2.
 No saved-vault volume mounted.
 
 Command: docker run --rm --entrypoint python ics0022-vault -m unittest discover -s tests -v

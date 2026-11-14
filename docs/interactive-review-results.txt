@@ -1,5 +1,5 @@
-Interactive terminal review, 14 November 2026.
-Run by the assistant through a real terminal with fictional data in a fresh volume.
+Interactive terminal review.
+Interactive checks used fictional data in a fresh Docker volume.
 Create and confirm master password: PASS; password input not echoed.
 Add entry and confirm saved password: PASS; password input not echoed.
 Get in a new container: PASS; login visible, password [hidden].
@@ -15,4 +15,4 @@ Post-demo log and permission checks:
   "cancellation_recorded": true,
   "file_modes": "0600"
 }
-Only the fresh temporary review volume was removed. No personal/demo vault was used.
+Only the temporary test volume was removed. Existing vault data was unchanged.

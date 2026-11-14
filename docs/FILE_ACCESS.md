@@ -39,7 +39,7 @@ process UIDs, not real accounts:
 docker compose run --rm --user 0 --entrypoint python vault -m unittest discover -s tests -p test_storage.py -v
 ```
 
-These Linux checks passed on 14 November 2026 in Docker. The full suite
+These Linux checks passed in Docker. The full suite
 also passed as root, including the two-UID test. Exact commands and output
 are saved in docker-test-results.txt. Containers used only temporary files;
 no real saved-vault volume was mounted.

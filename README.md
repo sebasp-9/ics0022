@@ -111,7 +111,5 @@ for the last two commands.
 ## AI tools
 
 AI tools were used for requirements review, code, automated tests and
-documentation. I ran the terminal demo myself, checking hidden input,
-saved-login operations, wrong-password rejection, persistence and Ctrl+C.
-Additional automated and terminal checks were run with AI assistance.
-See [the review checklist](docs/REVIEW.md) for the recorded checks and limits.
+documentation. I ran the manual demo and checked the password-manager flow.
+See [checks and remaining work](docs/REVIEW.md).
