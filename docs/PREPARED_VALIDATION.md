@@ -1,24 +1,25 @@
-# Prepared validation
+# Verification results
 
-Prepared and tested on 14 November 2026 using Python 3.12.14 on Windows,
-with the existing pinned dependencies. All changes were prepared on this
-date; later commits do not represent later test runs.
+Rechecked 14 November 2026, with cryptography 50.0.2 and argon2-cffi 25.1.0.
 
-```text
-Ran 37 tests in 2.010s
+| Environment | Result |
+|---|---|
+| Docker/Linux, normal user | 49 passed; one root-only test skipped |
+| Docker/Linux, root test run | All 50 passed, including two OS-user identities |
+| Windows, permissions available | 39 passed; 11 Linux-specific tests skipped |
 
-OK (skipped=9)
-```
+The restricted Windows sandbox previously skipped one additional hardlink
+test. Exact current output is in prepared-test-results.txt and
+docker-test-results.txt. Skips are not passing tests.
 
-Full output: [prepared-test-results.txt](prepared-test-results.txt).
+Real Linux pseudo-terminals verify hidden input, CRUD, wrong-password
+rejection and Ctrl+C without mocking getpass. Cross-container volume
+persistence passed using fictional data (persistence-results.txt).
 
-Skipped cases require Linux/POSIX, root in a disposable Linux container,
-or hardlink creation blocked by this sandbox. Skips are not passes.
-Docker/Linux was also verified on 14 November 2026. See
-[docker-test-results.txt](docker-test-results.txt) for exact commands and results.
-36 tests passed as non-root; the root-only case was skipped.
-All 37 passed as root, including the two-UID check.
-Password input was simulated in this increment; actual terminal
-verification is included in the third increment.
-The saved original security-test-results.txt remains historical evidence
-for the first 21 tests, not the expanded suite.
+The five public Python runtime packages have no known advisories reported
+by pip-audit 2.10.1 on this check. See DEPENDENCIES.md and dependency-audit.json
+for scope. The pip installer and OS packages were not part of that scan.
+
+All checks above were run with AI assistance. Personal checks are recorded
+separately in REVIEW.md. Older security-test-results.txt/PROGRESS.md entries
+remain historical evidence, not the latest result.

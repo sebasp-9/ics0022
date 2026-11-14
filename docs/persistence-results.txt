@@ -1,0 +1,5 @@
+Docker volume persistence verification, 14 November 2026.
+Separate non-root container: PASS
+Separate non-root container: PASS
+Saved entry persisted in a new Docker volume between containers; ciphertext contains no literal sample password; vault mode is 0600.
+Removed only the fresh verification volume. No existing volume was used.

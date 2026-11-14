@@ -1,0 +1,18 @@
+Interactive terminal review, 14 November 2026.
+Run by the assistant through a real terminal with fictional data in a fresh volume.
+Create and confirm master password: PASS; password input not echoed.
+Add entry and confirm saved password: PASS; password input not echoed.
+Get in a new container: PASS; login visible, password [hidden].
+Wrong master password: expected controlled rejection; no records displayed.
+Update and get in another container: PASS; changed login visible, password [hidden].
+Ctrl+C: expected cancellation; next list opened normally and entry remained.
+Delete with yes and list: PASS; vault empty.
+Post-demo log and permission checks:
+{
+  "audit_events": 28,
+  "secret_markers_in_log": false,
+  "failed_authentication_recorded": true,
+  "cancellation_recorded": true,
+  "file_modes": "0600"
+}
+Only the fresh temporary review volume was removed. No personal/demo vault was used.

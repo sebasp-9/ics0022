@@ -9,11 +9,11 @@ description = "A small encrypted command-line password vault for ICS0022."
 requires-python = ">=3.12"
 dependencies = [
     "argon2-cffi==25.1.0",
-    "cryptography==48.0.1",
+    "cryptography==50.0.2",
 ]
 
 [project.scripts]
-pwvault = "pwvault.cli:main"
+pwvault = "pwvault.cli:entrypoint"
 
 [tool.setuptools]
 packages = ["pwvault"]

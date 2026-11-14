@@ -1,7 +1,7 @@
-Linux Docker validation, 14 November 2026.
-Containers are disposable; no saved vault volume is mounted.
+Reviewed checkout, 14 November 2026; cryptography 50.0.2.
+No saved-vault volume mounted.
 
-Command: docker run --rm --entrypoint python ics0022-checkpoint3-step2 -m unittest discover -s tests -v
+Command: docker run --rm --entrypoint python ics0022-vault -m unittest discover -s tests -v
 
 test_end_event_failure_returns_error_after_completed_operation (test_audit.AuditTests.test_end_event_failure_returns_error_after_completed_operation) ... ok
 test_log_failure_before_operation_does_not_prompt_or_change_vault (test_audit.AuditTests.test_log_failure_before_operation_does_not_prompt_or_change_vault) ... ok
@@ -12,6 +12,17 @@ test_untrusted_event_fields_are_rejected (test_audit.AuditTests.test_untrusted_e
 test_exception_releases_lock (test_locking.LockTests.test_exception_releases_lock) ... ok
 test_lock_inode_is_reused (test_locking.LockTests.test_lock_inode_is_reused) ... ok
 test_second_command_is_rejected_before_password_prompt (test_locking.LockTests.test_second_command_is_rejected_before_password_prompt) ... ok
+test_authentication_log_failure_after_unlock_still_cleans (test_memory.MemoryTests.test_authentication_log_failure_after_unlock_still_cleans) ... ok
+test_cli_cleans_on_success_error_and_cancellation (test_memory.MemoryTests.test_cli_cleans_on_success_error_and_cancellation) ... ok
+test_creation_key_is_cleaned_on_success_and_failure (test_memory.MemoryTests.test_creation_key_is_cleaned_on_success_and_failure) ... ok
+test_encryption_plaintext_buffer_is_cleaned_even_on_failure (test_memory.MemoryTests.test_encryption_plaintext_buffer_is_cleaned_even_on_failure) ... ok
+test_hardening_failure_stops_before_any_command (test_memory.MemoryTests.test_hardening_failure_stops_before_any_command) ... ok
+test_invalid_schema_cleans_key_and_record_references (test_memory.MemoryTests.test_invalid_schema_cleans_key_and_record_references) ... ok
+test_kdf_allocation_failure_is_a_controlled_error (test_memory.MemoryTests.test_kdf_allocation_failure_is_a_controlled_error) ... ok
+test_linux_disables_core_dumps_and_process_dumpability (test_memory.MemoryTests.test_linux_disables_core_dumps_and_process_dumpability) ... ok
+test_successful_unlock_cleans_serialized_plaintext_but_keeps_live_key (test_memory.MemoryTests.test_successful_unlock_cleans_serialized_plaintext_but_keeps_live_key) ... ok
+test_unlock_failure_cleans_derived_key_and_plaintext (test_memory.MemoryTests.test_unlock_failure_cleans_derived_key_and_plaintext) ... ok
+test_wipe_overwrites_alias_without_resizing (test_memory.MemoryTests.test_wipe_overwrites_alias_without_resizing) ... ok
 test_duplicate_json_names_are_rejected (test_security.CryptoTests.test_duplicate_json_names_are_rejected) ... ok
 test_each_save_uses_fresh_nonce (test_security.CryptoTests.test_each_save_uses_fresh_nonce) ... ok
 test_encryption_round_trip_and_no_plaintext (test_security.CryptoTests.test_encryption_round_trip_and_no_plaintext) ... ok
@@ -40,13 +51,15 @@ test_hardlinked_vault_is_rejected (test_storage.PosixStorageTests.test_hardlinke
 test_opened_directory_survives_ancestor_replacement (test_storage.PosixStorageTests.test_opened_directory_survives_ancestor_replacement) ... ok
 test_unsafe_ancestor_is_rejected (test_storage.PosixStorageTests.test_unsafe_ancestor_is_rejected) ... ok
 test_other_os_user_cannot_read_or_replace_vault (test_storage.TwoUserTests.test_other_os_user_cannot_read_or_replace_vault) ... skipped 'Run as root in a disposable Linux test container for two-UID checks'
+test_ctrl_c_restores_prompt_and_preserves_vault (test_terminal.TerminalTests.test_ctrl_c_restores_prompt_and_preserves_vault) ... ok
+test_real_prompts_and_persistence_between_cli_processes (test_terminal.TerminalTests.test_real_prompts_and_persistence_between_cli_processes) ... ok
 
 ----------------------------------------------------------------------
-Ran 37 tests in 2.225s
+Ran 50 tests in 4.759s
 
 OK (skipped=1)
 
-Command: docker run --rm --user 0 --entrypoint python ics0022-checkpoint3-step2 -m unittest discover -s tests -v
+Command: docker run --rm --user 0 --entrypoint python ics0022-vault -m unittest discover -s tests -v
 
 test_end_event_failure_returns_error_after_completed_operation (test_audit.AuditTests.test_end_event_failure_returns_error_after_completed_operation) ... ok
 test_log_failure_before_operation_does_not_prompt_or_change_vault (test_audit.AuditTests.test_log_failure_before_operation_does_not_prompt_or_change_vault) ... ok
@@ -57,6 +70,17 @@ test_untrusted_event_fields_are_rejected (test_audit.AuditTests.test_untrusted_e
 test_exception_releases_lock (test_locking.LockTests.test_exception_releases_lock) ... ok
 test_lock_inode_is_reused (test_locking.LockTests.test_lock_inode_is_reused) ... ok
 test_second_command_is_rejected_before_password_prompt (test_locking.LockTests.test_second_command_is_rejected_before_password_prompt) ... ok
+test_authentication_log_failure_after_unlock_still_cleans (test_memory.MemoryTests.test_authentication_log_failure_after_unlock_still_cleans) ... ok
+test_cli_cleans_on_success_error_and_cancellation (test_memory.MemoryTests.test_cli_cleans_on_success_error_and_cancellation) ... ok
+test_creation_key_is_cleaned_on_success_and_failure (test_memory.MemoryTests.test_creation_key_is_cleaned_on_success_and_failure) ... ok
+test_encryption_plaintext_buffer_is_cleaned_even_on_failure (test_memory.MemoryTests.test_encryption_plaintext_buffer_is_cleaned_even_on_failure) ... ok
+test_hardening_failure_stops_before_any_command (test_memory.MemoryTests.test_hardening_failure_stops_before_any_command) ... ok
+test_invalid_schema_cleans_key_and_record_references (test_memory.MemoryTests.test_invalid_schema_cleans_key_and_record_references) ... ok
+test_kdf_allocation_failure_is_a_controlled_error (test_memory.MemoryTests.test_kdf_allocation_failure_is_a_controlled_error) ... ok
+test_linux_disables_core_dumps_and_process_dumpability (test_memory.MemoryTests.test_linux_disables_core_dumps_and_process_dumpability) ... ok
+test_successful_unlock_cleans_serialized_plaintext_but_keeps_live_key (test_memory.MemoryTests.test_successful_unlock_cleans_serialized_plaintext_but_keeps_live_key) ... ok
+test_unlock_failure_cleans_derived_key_and_plaintext (test_memory.MemoryTests.test_unlock_failure_cleans_derived_key_and_plaintext) ... ok
+test_wipe_overwrites_alias_without_resizing (test_memory.MemoryTests.test_wipe_overwrites_alias_without_resizing) ... ok
 test_duplicate_json_names_are_rejected (test_security.CryptoTests.test_duplicate_json_names_are_rejected) ... ok
 test_each_save_uses_fresh_nonce (test_security.CryptoTests.test_each_save_uses_fresh_nonce) ... ok
 test_encryption_round_trip_and_no_plaintext (test_security.CryptoTests.test_encryption_round_trip_and_no_plaintext) ... ok
@@ -85,8 +109,10 @@ test_hardlinked_vault_is_rejected (test_storage.PosixStorageTests.test_hardlinke
 test_opened_directory_survives_ancestor_replacement (test_storage.PosixStorageTests.test_opened_directory_survives_ancestor_replacement) ... ok
 test_unsafe_ancestor_is_rejected (test_storage.PosixStorageTests.test_unsafe_ancestor_is_rejected) ... ok
 test_other_os_user_cannot_read_or_replace_vault (test_storage.TwoUserTests.test_other_os_user_cannot_read_or_replace_vault) ... ok
+test_ctrl_c_restores_prompt_and_preserves_vault (test_terminal.TerminalTests.test_ctrl_c_restores_prompt_and_preserves_vault) ... ok
+test_real_prompts_and_persistence_between_cli_processes (test_terminal.TerminalTests.test_real_prompts_and_persistence_between_cli_processes) ... ok
 
 ----------------------------------------------------------------------
-Ran 37 tests in 2.852s
+Ran 50 tests in 5.342s
 
 OK

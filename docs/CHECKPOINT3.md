@@ -1,99 +1,40 @@
-# Checkpoint 3 progress
+# Checkpoint 3 and final project status
 
-14 November 2026. **Started, not complete.** The supplied ICS0022 project
-brief lists checkpoint 3 as 20 November 2026 (section 1.1). Requirements are
-in sections 4.2 and 4.4.3; the report structure is in section 1.3.
+Reviewed 14 November 2026. The implementation, tests, report source and
+presentation notes are included in the repository. The Git history records
+the separate implementation steps. REVIEW.md distinguishes the student's
+reported manual demo from checks run with AI assistance.
 
-## First increment: validation and repeatable tests
-
-- Added a standard-library `unittest` suite using temporary vaults and
-  fictional credentials. It runs the real Argon2id and AES-GCM code.
-- Master-password validation now handles wrong types and invalid Unicode
-  with a controlled error. New passwords must be printable. Unlocking still
-  accepts control characters allowed by checkpoint 2, so existing vaults do
-  not become inaccessible because of the new creation policy.
-- Decrypted JSON now rejects duplicate object names at every nesting level.
-  Previously Python silently kept the last duplicate title or record field.
-  This is a format/data-integrity check after authentication, not a way for
-  someone without the key to bypass AES-GCM.
-- Included tests in the Docker image and documented both Docker and local
-  Python test commands in the README.
-
-The regression tests first reproduced the password and duplicate-name gaps
-against checkpoint 2 before the fixes were applied. The vault format and
-cryptographic parameters have not changed.
-
-## Validation results
-
-Python 3.12.14 on Windows, using a fresh project virtual environment with
-the pinned dependencies: **21 tests run, 20 passed, 1 skipped**.
-The skipped case requires POSIX file ownership and permissions.
-`pip check`, the installed `pwvault --help` command and `git diff --check`
-also passed. Full output is in [security-test-results.txt](security-test-results.txt).
-
-| Area | Evidence in the suite |
+| Required item | Status |
 |---|---|
-| Encryption | Round trip; no literal credential text in ciphertext; fresh nonce on save |
-| Integrity/authentication | Wrong password; modified salt, nonce, ciphertext and tag all rejected |
-| File parser | Invalid size or KDF costs rejected before derivation; malformed JSON and duplicate names rejected |
-| Field validation | Exact length boundaries; wrong types; Unicode; NUL, escape and control characters; invalid record schemas |
-| CLI | Add/list/get/update/delete; password stays hidden; literal shell/format syntax remains data |
-| Failure paths | Every existing-vault command rejects wrong passwords without changing the file; invalid saves and failed replacement preserve the vault |
-| Storage | Existing files cannot be overwritten by init; temporary files removed after failure |
-| Error output | Simulated OS error does not expose its message/path or a traceback |
-| Password prompt | Redirected input refused before calling getpass |
+| Encrypted credential storage and CRUD | Implemented and tested |
+| Master-password access | Salted Argon2id-derived key plus AES-GCM authentication; password not stored |
+| Validation | Type/size/text/schema/header/path checks, including negative cases |
+| Structured logging and controlled errors | Implemented; no saved fields, keys or passwords passed to the writer |
+| Per-user ownership | Linux file policy and two-UID isolation test passed |
+| Secure memory handling | Owned buffers overwritten, finally cleanup and Linux dump restrictions; immutable/native copy erasure remains a qualification |
+| Tests | All 50 passed as root in disposable Linux containers; 49 passed as the normal user with the root-only case skipped |
+| Report | REPORT.md has Introduction, Implementation, Security Analysis and Conclusion; formatted PDF is in the prepared deliverables |
 
-These tests do not prove secure memory erasure, per-user isolation or freedom
-from filesystem races. They simulate password input, rather than testing an
-actual terminal. Deleting an entry removes it from the current encrypted
-payload; it is not a promise to erase backups, old filesystem blocks or RAM.
+Real Linux terminal tests verify echo is off, CRUD persists across CLI
+processes, and Ctrl+C preserves the vault and releases the command.
+Separate-container volume persistence also passed. No existing user vault
+or Docker volume was used for verification.
 
-Docker was unavailable during initial Windows validation. On 14 November
-2026 the prepared image built and Linux tests passed. Current evidence is
-in [PREPARED_VALIDATION.md](PREPARED_VALIDATION.md) and docker-test-results.txt;
-the checkpoint 2 results in PROGRESS.md remain historical evidence.
+See PREPARED_VALIDATION.md, docker-test-results.txt and persistence-results.txt
+for evidence. PROGRESS.md and security-test-results.txt describe older work.
 
-## Remaining meaningful increments
+## Before handing it in
 
-Update: structured logging is implemented, with authentication and command
-events, private log files and failure-path tests. See [LOGGING.md](LOGGING.md).
-Linux file access now uses opened directory handles, validates ownership and
-rejects ancestor links. See [FILE_ACCESS.md](FILE_ACCESS.md) for the model and
-passing Linux/two-UID verification. The list below records the original plan;
-memory work and the report are still pending. The results above describe the original 21-test suite;
-run the full suite for current results.
+1. Read the code guide and report so you can explain the design and limits.
+2. Review the local commits and push them when ready.
+3. Verify the source and report in the submission ZIP match your reviewed code.
+4. Submit through Moodle and prepare the on-site demonstration yourself.
 
-1. **Structured logging and failure handling.** Add an event schema with
-   timestamp, OS user identity, operation and outcome. This offline CLI has
-   no network source address; record that explicitly where needed. Keep
-   titles, usernames, paths, passwords, keys and vault contents out of logs.
-   Protect the log file and test log injection, secret absence and failures
-   during logging, authentication and storage.
-2. **Memory lifecycle and access control.** Reduce plaintext/key lifetimes
-   and release resources on success, failure and cancellation. Do not claim
-   `del` or overwriting one buffer erases immutable Python/library copies.
-   Decide how to meet the brief's wiping requirement and document residual
-   risk. Audit every operation against OS-user ownership, ancestor directory
-   links/reparse points and check/use races; test as two Linux users. Shared
-   Docker volumes run under the same UID and are not separate user accounts.
-3. **Report and final verification.** Write Introduction, Implementation,
-   Security Analysis and Conclusion, referencing actual controls and test
-   evidence. Rebuild Docker, run the POSIX suite, test a real hidden terminal
-   prompt and persistence, then record results. Add permission/link/race and
-   memory-handling regression cases alongside the relevant changes.
+The strict immediate-erasure wording is not fully satisfied by Python.
+The report documents that limit; it must not be presented as a guarantee.
+The source, tests and technical report are otherwise prepared for the stated
+prototype scope. Personal review, submission and presentation remain yours.
 
-The design also planned password generation, clipboard support and changing
-the master password. These are extra planned features, not explicit
-checkpoint 3 deliverables in the supplied brief. Review their value after
-the required controls; the interface must continue to avoid printing secrets.
-
-Each increment above is substantive future work suitable for its own commit.
-This note is a progress record, not the report draft or a claim that checkpoint
-3 is ready for submission.
-
-## Course context
-
-See [course review](COURSE_REVIEW.md) for the supplied materials, review scope
-and relevant stable slide references. ICS0027's automated tests inspired the
-repeatable test approach; its Flask sessions, CSRF and SQL controls do not
-apply directly to this offline encrypted-file CLI.
+The supplied brief lists checkpoint 3 as 20 November and final submission
+as 4 December 2026. These are the supplied schedule, not a live Moodle check.

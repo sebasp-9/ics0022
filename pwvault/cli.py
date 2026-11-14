@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 import warnings
 
-from . import audit, locking, storage, users
+from . import audit, locking, memory, storage, users
 from .errors import VaultError
 
 DEFAULT_VAULT = Path.home() / ".pwvault" / "vault.pvz"
@@ -67,8 +67,8 @@ def run(args, log=None):
     if args.command == "init":
         if path.exists() or path.is_symlink():
             raise VaultError("A vault already exists at this path. It was not overwritten.")
-        password = new_password("Choose a master password: ", master=True)
-        users.create(path, password, create_parent=args.vault is None)
+        users.create(path, new_password("Choose a master password: ", master=True),
+                     create_parent=args.vault is None)
         print("Vault created.")
         return
 
@@ -80,8 +80,17 @@ def run(args, log=None):
         if log is not None and error.code == 2:
             audit.record(log, args.command, "failure", event="authentication")
         raise
-    if log is not None:
-        audit.record(log, args.command, "success", event="authentication")
+    try:
+        if log is not None:
+            audit.record(log, args.command, "success", event="authentication")
+        return operate(args, path, key, salt, items)
+    finally:
+        memory.wipe(key)
+        memory.clear_items(items)
+
+
+def operate(args, path, key, salt, items):
+    """Work on an unlocked vault. run() always cleans up when this returns."""
     if args.command == "list":
         for title in sorted(items):
             print(title)
@@ -176,3 +185,12 @@ def main(argv=None):
     except (EOFError, KeyboardInterrupt):
         print("\nCancelled.", file=sys.stderr)
         return 1
+
+
+def entrypoint():
+    try:
+        memory.harden_process()
+    except (VaultError, OSError, ValueError):
+        print("Error: Cannot enable process memory protections.", file=sys.stderr)
+        return 3
+    return main()

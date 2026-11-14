@@ -1,7 +1,7 @@
 """Create/unlock the vault and validate its saved logins."""
 import os
 
-from . import crypto, storage
+from . import crypto, memory, storage
 from .errors import VaultError
 
 
@@ -44,14 +44,29 @@ def create(path, password, create_parent=False):
     master_password(password, new=True)
     storage.check_parent(path, create=create_parent)
     salt = os.urandom(16)
-    key = crypto.derive_key(password, salt)
-    storage.write(path, crypto.encrypt(key, salt, {}), new=True)
+    try:
+        key = crypto.derive_key(password, salt)
+    finally:
+        password = None  # Release our immutable input reference as soon as possible.
+    try:
+        storage.write(path, crypto.encrypt(key, salt, {}), new=True)
+    finally:
+        memory.wipe(key)
 
 
 def open_vault(path, password):
     master_password(password)
-    key, salt, items = crypto.unlock(storage.read(path), password)
-    validate_items(items)
+    try:
+        key, salt, items = crypto.unlock(storage.read(path), password)
+    finally:
+        password = None
+    try:
+        validate_items(items)
+    except BaseException:
+        memory.wipe(key)
+        if isinstance(items, dict):
+            memory.clear_items(items)
+        raise
     return key, salt, items
 
 

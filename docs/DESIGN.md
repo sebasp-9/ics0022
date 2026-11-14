@@ -80,10 +80,10 @@ every read, which also detects if the encrypted data has been changed. The plain
 is supplied as associated data, so the salt and the Argon2 settings are covered by the tag
 and cannot be weakened.
 
-**Checking the master password.** No password hash is stored. A wrong password derives a
-wrong key, and then the tag verification fails. The ICS0027 web application does store a
-`password_hash`, because a server has to authenticate the user before it can derive
-anything. Here there is no server, so the tag is enough.
+**Checking the master password.** No separate password verifier is stored. A wrong password
+derives the wrong key, so AES-GCM tag verification fails. The web project has a separate
+account verifier; this offline vault authenticates its derived key through the tag. This
+is a design choice, not a requirement that every server use the same authentication flow.
 
 | Size | Field |
 | --- | --- |
@@ -123,7 +123,8 @@ left for a later checkpoint.
 
 Python 3.12, because it manages memory automatically and it matches the web application
 built for ICS0027. The main risk in a password manager is using cryptography incorrectly
-rather than memory corruption, and Python removes buffer overflows completely. The drawback
+rather than manual buffer handling. Python-managed containers avoid raw buffer operations,
+while native dependencies can still contain memory-safety defects. The drawback
 is that it cannot reliably erase a string from memory, which remains a limitation; the implementation limits
 plaintext lifetime by exiting after each command.
 
@@ -166,3 +167,11 @@ headers, size, structure or file access checks.
 Remaining limitations: one writer at a time, no rollback detection, no guaranteed
 secret-memory erasure and no recovery for a forgotten master password.
 See PROGRESS.md for validation results, including the successful Docker build and checks.
+
+## 7. Checkpoint 3 update
+
+The report and CHECKPOINT3.md describe the current implementation. Command
+locking, owned-buffer cleanup, Linux process protections and structured logs
+are now implemented and tested. Generation, clipboard support and changing
+the master password were earlier ideas, not required features. Reliable
+erasure of every Python/native copy remains a documented limitation.

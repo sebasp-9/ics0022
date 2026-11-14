@@ -42,7 +42,7 @@ option or clipboard retrieval.
 
 Docker removes each container after the command, but keeps the encrypted vault
 in the `vault-data` volume. Keep the same project folder name to reuse it.
-Deleting that volume deletes the vault. Run one command at a time.
+Deleting that volume deletes the vault. A second concurrent command is refused.
 
 ## How it works
 
@@ -55,32 +55,27 @@ Deleting that volume deletes the vault. Run one command at a time.
    a temporary file, then replace the old vault.
 
 Titles, login names and passwords are all encrypted. On Linux, the app also
-checks file ownership and private permissions. Python cannot guarantee erasure
-of passwords or keys from memory; memory handling still needs work.
+checks file ownership and private permissions.
 
 The code follows the same flow: `cli.py` handles commands and prompts,
 `users.py` validates fields and coordinates operations, `crypto.py` handles
 encryption, and `storage.py` reads and writes the file. These are in `pwvault/`.
 
-## Progress
+## Project status
 
-Checkpoint 2 added the basic commands and encrypted storage. Its Docker build
-and 31 CLI checks passed; see the [checkpoint 2 note](docs/PROGRESS.md).
+The final Python implementation includes validation, structured logging,
+OS-user file checks, command locking, buffer cleanup and Linux dump restrictions.
+All 50 tests passed in Linux/Docker, including terminal input and two-user checks.
+The normal-user run skips the one test that needs root; run that separately.
 
-Checkpoint 3 is **in progress**: validation fixes and automated tests are in
-place. See [validation results](docs/PREPARED_VALIDATION.md) for current
-Windows checks and skips. Docker images now build successfully, and
-the Linux tests pass; details are in the same validation note.
-Structured logging is now implemented; see [logging behavior](docs/LOGGING.md).
-Linux file-access protections and tests are prepared; see
-[file access and the Linux checks](docs/FILE_ACCESS.md).
-Memory handling and the report remain. Linux verification passed; see the validation results.
-Password generation, clipboard support and master-password changes are also
-planned, but are not explicit checkpoint 3 requirements.
+Python cannot guarantee erasure of every secret copy. The report explains
+this qualification against the brief's strict memory-wiping requirement.
+Read [the report](docs/REPORT.md), [test evidence](docs/PREPARED_VALIDATION.md),
+and [the code and presentation guide](docs/EXPLAIN_THE_CODE.md).
+No password generation, clipboard or password-change command is provided;
+these earlier ideas were outside the required project scope.
 
-See [checkpoint 3 results and next steps](docs/CHECKPOINT3.md) and
-[the design and threat model](docs/DESIGN.md). For submission, include the source,
-Dockerfile, Compose file and documentation.
+For earlier work, see the [checkpoint 2 note](docs/PROGRESS.md).
 
 ## Run the tests
 
@@ -91,10 +86,15 @@ docker compose build
 docker compose run --rm --entrypoint python vault -m unittest discover -s tests -v
 ```
 
-Tests use disposable vaults and fictional passwords. They do not open your
-normal vault. Password prompts are simulated; real terminal behavior still
-needs a manual check. The POSIX permissions test runs on Linux and is skipped
-on Windows.
+Tests use disposable vaults and fictional passwords, not your normal vault.
+Linux includes real pseudo-terminal checks. Windows skips Linux-specific tests.
+To include the two-user ownership test, also run in the test container as root:
+
+```sh
+docker compose run --rm --user 0 --entrypoint python vault -m unittest discover -s tests -v
+```
+
+Root is only for this test run; normal vault commands use the image's non-root user.
 
 For development without Docker, install Python 3.12 or newer, then run from
 the project directory on Windows:
@@ -107,3 +107,11 @@ python -m venv .venv
 
 On Linux/macOS, use `python3` for the first command and `.venv/bin/python`
 for the last two commands.
+
+## AI tools
+
+AI tools were used for requirements review, code, automated tests and
+documentation. I ran the terminal demo myself, checking hidden input,
+saved-login operations, wrong-password rejection, persistence and Ctrl+C.
+Additional automated and terminal checks were run with AI assistance.
+See [the review checklist](docs/REVIEW.md) for the recorded checks and limits.
