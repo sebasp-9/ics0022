@@ -48,11 +48,18 @@ from filesystem races. They simulate password input, rather than testing an
 actual terminal. Deleting an entry removes it from the current encrypted
 payload; it is not a promise to erase backups, old filesystem blocks or RAM.
 
-Docker's Linux engine was unavailable in this session. The updated image,
-container test command and POSIX case still need to be run on Linux/Docker;
-the checkpoint 2 Docker results in PROGRESS.md are historical results.
+Docker was unavailable during initial Windows validation. On 14 November
+2026 the prepared image built and Linux tests passed. Current evidence is
+in [PREPARED_VALIDATION.md](PREPARED_VALIDATION.md) and docker-test-results.txt;
+the checkpoint 2 results in PROGRESS.md remain historical evidence.
 
 ## Remaining meaningful increments
+
+Update: structured logging is implemented, with authentication and command
+events, private log files and failure-path tests. See [LOGGING.md](LOGGING.md).
+The list below records the original plan; memory/access work and the report
+are still pending. The results above describe the original 21-test suite;
+run the full suite for current results.
 
 1. **Structured logging and failure handling.** Add an event schema with
    timestamp, OS user identity, operation and outcome. This offline CLI has

@@ -1,0 +1,36 @@
+Prepared and tested 14 November 2026, Windows, Python 3.12.14.
+argon2-cffi 25.1.0; cryptography 48.0.1.
+Command: python -m unittest discover -s tests -v
+
+test_end_event_failure_returns_error_after_completed_operation (test_audit.AuditTests.test_end_event_failure_returns_error_after_completed_operation) ... ok
+test_log_failure_before_operation_does_not_prompt_or_change_vault (test_audit.AuditTests.test_log_failure_before_operation_does_not_prompt_or_change_vault) ... ok
+test_log_hardlink_is_rejected (test_audit.AuditTests.test_log_hardlink_is_rejected) ... skipped 'Hardlink creation is unavailable in this environment'
+test_log_permissions_are_private_and_public_log_is_refused (test_audit.AuditTests.test_log_permissions_are_private_and_public_log_is_refused) ... skipped 'Requires POSIX permissions'
+test_success_failure_and_cancellation (test_audit.AuditTests.test_success_failure_and_cancellation) ... ok
+test_untrusted_event_fields_are_rejected (test_audit.AuditTests.test_untrusted_event_fields_are_rejected) ... ok
+test_duplicate_json_names_are_rejected (test_security.CryptoTests.test_duplicate_json_names_are_rejected) ... ok
+test_each_save_uses_fresh_nonce (test_security.CryptoTests.test_each_save_uses_fresh_nonce) ... ok
+test_encryption_round_trip_and_no_plaintext (test_security.CryptoTests.test_encryption_round_trip_and_no_plaintext) ... ok
+test_invalid_header_and_size_rejected_before_kdf (test_security.CryptoTests.test_invalid_header_and_size_rejected_before_kdf) ... ok
+test_malformed_authenticated_json_is_rejected (test_security.CryptoTests.test_malformed_authenticated_json_is_rejected) ... ok
+test_wrong_password_and_tampering_fail_authentication (test_security.CryptoTests.test_wrong_password_and_tampering_fail_authentication) ... ok
+test_invalid_paths (test_security.ValidationTests.test_invalid_paths) ... ok
+test_legacy_control_character_passwords_remain_usable_for_unlock (test_security.ValidationTests.test_legacy_control_character_passwords_remain_usable_for_unlock) ... ok
+test_master_password_boundaries (test_security.ValidationTests.test_master_password_boundaries) ... ok
+test_schema_rejects_invalid_records (test_security.ValidationTests.test_schema_rejects_invalid_records) ... ok
+test_shell_and_format_syntax_remain_literal_data (test_security.ValidationTests.test_shell_and_format_syntax_remain_literal_data) ... ok
+test_text_boundaries_and_unicode (test_security.ValidationTests.test_text_boundaries_and_unicode) ... ok
+test_cli_add_list_get_update_delete (test_security.VaultTests.test_cli_add_list_get_update_delete) ... ok
+test_every_existing_vault_command_requires_authentication (test_security.VaultTests.test_every_existing_vault_command_requires_authentication) ... ok
+test_failed_replace_preserves_vault_and_removes_tempfile (test_security.VaultTests.test_failed_replace_preserves_vault_and_removes_tempfile) ... ok
+test_initialization_never_overwrites_existing_vault (test_security.VaultTests.test_initialization_never_overwrites_existing_vault) ... ok
+test_invalid_save_preserves_vault (test_security.VaultTests.test_invalid_save_preserves_vault) ... ok
+test_invalid_title_rejected_without_prompt_or_write (test_security.VaultTests.test_invalid_title_rejected_without_prompt_or_write) ... ok
+test_os_errors_hide_internal_details (test_security.VaultTests.test_os_errors_hide_internal_details) ... ok
+test_posix_private_permissions_on_read_and_save (test_security.VaultTests.test_posix_private_permissions_on_read_and_save) ... skipped 'Requires POSIX owner and mode semantics'
+test_redirected_password_input_is_refused (test_security.VaultTests.test_redirected_password_input_is_refused) ... ok
+
+----------------------------------------------------------------------
+Ran 27 tests in 1.825s
+
+OK (skipped=3)

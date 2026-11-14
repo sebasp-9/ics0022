@@ -22,7 +22,7 @@ docker compose run --rm vault init
 If you already have the project, open its folder and run the build command.
 Run `init` only to create a new vault; it refuses to overwrite an existing one.
 
-Choose and confirm a master password of 12–128 printable characters.
+Choose and confirm a master password of 12-128 printable characters.
 Password prompts stay blank while you type. A forgotten master password cannot
 be recovered.
 
@@ -68,9 +68,11 @@ Checkpoint 2 added the basic commands and encrypted storage. Its Docker build
 and 31 CLI checks passed; see the [checkpoint 2 note](docs/PROGRESS.md).
 
 Checkpoint 3 is **in progress**: validation fixes and automated tests are in
-place, with 20 tests passed and one POSIX test skipped on Windows. The updated
-Docker image still needs verification because the engine was unavailable.
-Logging, memory handling, access-control hardening and the report remain.
+place. See [validation results](docs/PREPARED_VALIDATION.md) for current
+Windows checks and skips. Docker images now build successfully, and
+the Linux tests pass; details are in the same validation note.
+Structured logging is now implemented; see [logging behavior](docs/LOGGING.md).
+Memory handling, access-control hardening and the report remain.
 Password generation, clipboard support and master-password changes are also
 planned, but are not explicit checkpoint 3 requirements.
 

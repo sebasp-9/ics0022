@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 import warnings
 
-from . import storage, users
+from . import audit, storage, users
 from .errors import VaultError
 
 DEFAULT_VAULT = Path.home() / ".pwvault" / "vault.pvz"
@@ -60,7 +60,7 @@ def parser():
     return command_line
 
 
-def run(args):
+def run(args, log=None):
     path = storage.vault_path(args.vault if args.vault is not None else DEFAULT_VAULT)
     if hasattr(args, "title"):
         users.text_field(args.title, "Title", 100)
@@ -74,7 +74,14 @@ def run(args):
 
     # Check the file before prompting, then verify authentication before any output.
     storage.read(path)
-    key, salt, items = users.open_vault(path, password_prompt("Master password: "))
+    try:
+        key, salt, items = users.open_vault(path, password_prompt("Master password: "))
+    except VaultError as error:
+        if log is not None and error.code == 2:
+            audit.record(log, args.command, "failure", event="authentication")
+        raise
+    if log is not None:
+        audit.record(log, args.command, "success", event="authentication")
     if args.command == "list":
         for title in sorted(items):
             print(title)
@@ -109,29 +116,45 @@ def run(args):
     elif args.command == "delete":
         if input("Delete this saved login? Type yes to confirm: ") != "yes":
             print("Deletion cancelled.")
-            return
+            return "cancelled"
         del items[title]
         users.save(path, key, salt, items)
         print("Saved login deleted.")
 
 
-def main(argv=None):
+def execute(args, log):
     try:
-        run(parser().parse_args(argv))
-        return 0
+        outcome = run(args, log) or "success"
+        return 0, outcome
     except VaultError as error:
         print("Error: " + str(error), file=sys.stderr)
-        return error.code
+        return error.code, "failure"
     except FileExistsError:
         print("Error: The vault already exists. Nothing was overwritten.", file=sys.stderr)
-        return 1
+        return 1, "failure"
     except FileNotFoundError:
         print("Error: The vault or its parent directory does not exist.", file=sys.stderr)
-        return 3
+        return 3, "failure"
     except (PermissionError, OSError, ValueError, RuntimeError):
         # Operating-system errors can contain user-controlled filenames; hide details.
         print("Error: Cannot safely read or save the vault. Check its path and permissions.", file=sys.stderr)
-        return 3
+        return 3, "failure"
     except (EOFError, KeyboardInterrupt):
         print("\nCancelled.", file=sys.stderr)
-        return 1
+        return 1, "cancelled"
+
+
+def main(argv=None):
+    args = parser().parse_args(argv)
+    try:
+        path = storage.vault_path(args.vault if args.vault is not None else DEFAULT_VAULT)
+        with audit.open_log(path, create_parent=args.command == "init" and args.vault is None) as log:
+            # Refuse to run unless the initial event is safely recorded.
+            audit.record(log, args.command, "attempt")
+            code, outcome = execute(args, log)
+            audit.record(log, args.command, outcome)
+            return code
+    except (VaultError, OSError, ValueError, RuntimeError, KeyError):
+        print("Error: Cannot safely write the audit log. Check its directory and permissions.",
+              file=sys.stderr)
+        return 3

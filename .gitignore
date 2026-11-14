@@ -2,6 +2,7 @@
 *.pvz
 *.pvz.tmp-*
 .pwvault/
+audit.jsonl
 *.key
 *.pem
 

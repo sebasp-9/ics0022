@@ -7,14 +7,14 @@ from .errors import VaultError
 
 def text_field(value, label, maximum=200):
     if not isinstance(value, str) or not 1 <= len(value) <= maximum or not value.isprintable():
-        raise VaultError(label + " must contain 1–" + str(maximum) + " printable characters.")
+        raise VaultError(label + " must contain 1-" + str(maximum) + " printable characters.")
     return value
 
 
 def master_password(value, new=False):
     minimum = 12 if new else 1
     if not isinstance(value, str) or not minimum <= len(value) <= 128:
-        raise VaultError("The master password must contain " + str(minimum) + "–128 characters.")
+        raise VaultError("The master password must contain " + str(minimum) + "-128 characters.")
     try:
         value.encode("utf-8")
     except UnicodeEncodeError:
