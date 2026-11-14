@@ -72,7 +72,9 @@ place. See [validation results](docs/PREPARED_VALIDATION.md) for current
 Windows checks and skips. Docker images now build successfully, and
 the Linux tests pass; details are in the same validation note.
 Structured logging is now implemented; see [logging behavior](docs/LOGGING.md).
-Memory handling, access-control hardening and the report remain.
+Linux file-access protections and tests are prepared; see
+[file access and the Linux checks](docs/FILE_ACCESS.md).
+Memory handling and the report remain. Linux verification passed; see the validation results.
 Password generation, clipboard support and master-password changes are also
 planned, but are not explicit checkpoint 3 requirements.
 

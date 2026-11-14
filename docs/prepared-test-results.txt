@@ -8,6 +8,9 @@ test_log_hardlink_is_rejected (test_audit.AuditTests.test_log_hardlink_is_reject
 test_log_permissions_are_private_and_public_log_is_refused (test_audit.AuditTests.test_log_permissions_are_private_and_public_log_is_refused) ... skipped 'Requires POSIX permissions'
 test_success_failure_and_cancellation (test_audit.AuditTests.test_success_failure_and_cancellation) ... ok
 test_untrusted_event_fields_are_rejected (test_audit.AuditTests.test_untrusted_event_fields_are_rejected) ... ok
+test_exception_releases_lock (test_locking.LockTests.test_exception_releases_lock) ... ok
+test_lock_inode_is_reused (test_locking.LockTests.test_lock_inode_is_reused) ... ok
+test_second_command_is_rejected_before_password_prompt (test_locking.LockTests.test_second_command_is_rejected_before_password_prompt) ... ok
 test_duplicate_json_names_are_rejected (test_security.CryptoTests.test_duplicate_json_names_are_rejected) ... ok
 test_each_save_uses_fresh_nonce (test_security.CryptoTests.test_each_save_uses_fresh_nonce) ... ok
 test_encryption_round_trip_and_no_plaintext (test_security.CryptoTests.test_encryption_round_trip_and_no_plaintext) ... ok
@@ -29,8 +32,15 @@ test_invalid_title_rejected_without_prompt_or_write (test_security.VaultTests.te
 test_os_errors_hide_internal_details (test_security.VaultTests.test_os_errors_hide_internal_details) ... ok
 test_posix_private_permissions_on_read_and_save (test_security.VaultTests.test_posix_private_permissions_on_read_and_save) ... skipped 'Requires POSIX owner and mode semantics'
 test_redirected_password_input_is_refused (test_security.VaultTests.test_redirected_password_input_is_refused) ... ok
+test_parent_traversal_is_rejected (test_storage.PathTests.test_parent_traversal_is_rejected) ... ok
+test_fifo_is_rejected_without_opening_or_blocking (test_storage.PosixStorageTests.test_fifo_is_rejected_without_opening_or_blocking) ... skipped 'Requires Linux/POSIX file operations'
+test_file_and_ancestor_links_are_rejected (test_storage.PosixStorageTests.test_file_and_ancestor_links_are_rejected) ... skipped 'Requires Linux/POSIX file operations'
+test_hardlinked_vault_is_rejected (test_storage.PosixStorageTests.test_hardlinked_vault_is_rejected) ... skipped 'Requires Linux/POSIX file operations'
+test_opened_directory_survives_ancestor_replacement (test_storage.PosixStorageTests.test_opened_directory_survives_ancestor_replacement) ... skipped 'Requires Linux/POSIX file operations'
+test_unsafe_ancestor_is_rejected (test_storage.PosixStorageTests.test_unsafe_ancestor_is_rejected) ... skipped 'Requires Linux/POSIX file operations'
+test_other_os_user_cannot_read_or_replace_vault (test_storage.TwoUserTests.test_other_os_user_cannot_read_or_replace_vault) ... skipped 'Run as root in a disposable Linux test container for two-UID checks'
 
 ----------------------------------------------------------------------
-Ran 27 tests in 1.825s
+Ran 37 tests in 2.010s
 
-OK (skipped=3)
+OK (skipped=9)

@@ -3,6 +3,7 @@
 *.pvz.tmp-*
 .pwvault/
 audit.jsonl
+.pwvault.lock
 *.key
 *.pem
 

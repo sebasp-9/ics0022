@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 import warnings
 
-from . import audit, storage, users
+from . import audit, locking, storage, users
 from .errors import VaultError
 
 DEFAULT_VAULT = Path.home() / ".pwvault" / "vault.pvz"
@@ -144,8 +144,7 @@ def execute(args, log):
         return 1, "cancelled"
 
 
-def main(argv=None):
-    args = parser().parse_args(argv)
+def logged_command(args):
     try:
         path = storage.vault_path(args.vault if args.vault is not None else DEFAULT_VAULT)
         with audit.open_log(path, create_parent=args.command == "init" and args.vault is None) as log:
@@ -158,3 +157,22 @@ def main(argv=None):
         print("Error: Cannot safely write the audit log. Check its directory and permissions.",
               file=sys.stderr)
         return 3
+
+
+def main(argv=None):
+    args = parser().parse_args(argv)
+    try:
+        path = storage.vault_path(args.vault if args.vault is not None else DEFAULT_VAULT)
+        storage.check_parent(path, create=args.command == "init" and args.vault is None)
+        with locking.exclusive(path):
+            return logged_command(args)
+    except VaultError as error:
+        print("Error: " + str(error), file=sys.stderr)
+        return error.code
+    except (OSError, ValueError, RuntimeError):
+        print("Error: Cannot safely access the vault directory. Check its path and permissions.",
+              file=sys.stderr)
+        return 3
+    except (EOFError, KeyboardInterrupt):
+        print("\nCancelled.", file=sys.stderr)
+        return 1

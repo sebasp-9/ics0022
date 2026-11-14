@@ -15,11 +15,7 @@ OUTCOMES = {"attempt", "success", "failure", "cancelled"}
 def open_log(vault_path, create_parent=False):
     storage.check_parent(vault_path, create=create_parent)
     path = vault_path.parent / "audit.jsonl"
-    if path.exists() or path.is_symlink():
-        storage.check_file(path.lstat())
-    flags = os.O_WRONLY | os.O_APPEND | os.O_CREAT
-    flags |= getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
-    descriptor = os.open(path, flags, 0o600)
+    descriptor = storage.open_audit(path)
     try:
         storage.check_file(os.fstat(descriptor))
         yield descriptor

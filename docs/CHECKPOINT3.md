@@ -57,8 +57,10 @@ the checkpoint 2 results in PROGRESS.md remain historical evidence.
 
 Update: structured logging is implemented, with authentication and command
 events, private log files and failure-path tests. See [LOGGING.md](LOGGING.md).
-The list below records the original plan; memory/access work and the report
-are still pending. The results above describe the original 21-test suite;
+Linux file access now uses opened directory handles, validates ownership and
+rejects ancestor links. See [FILE_ACCESS.md](FILE_ACCESS.md) for the model and
+passing Linux/two-UID verification. The list below records the original plan;
+memory work and the report are still pending. The results above describe the original 21-test suite;
 run the full suite for current results.
 
 1. **Structured logging and failure handling.** Add an event schema with
