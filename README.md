@@ -1,35 +1,30 @@
 # Secure Password Manager
 
-Course project for **ICS0022 Secure Programming** (TalTech).
-Author: Sebastian Parra Pinto.
+ICS0022 Secure Programming, TalTech. Sebastian Parra Pinto.
 
-A terminal application that stores login names and passwords in one encrypted
-vault. Each command requires the master password. Passwords are never printed.
+A terminal app that stores login names and passwords in one encrypted file
+(the vault). Each command asks for the master password. Passwords are never printed.
 
 ## Run with Docker
 
 Install and start **Docker Desktop** (Windows/macOS), or **Docker Engine with
 Compose** (Linux). Use Linux containers. No Python installation is needed.
 
-Download and build the project:
+Download, build and create your vault:
 
 ```sh
 git clone https://github.com/sebasp-9/ics0022.git
 cd ics0022
 docker compose build
-```
-
-If you already have the project, open a terminal in its folder and run only
-the build command.
-
-Create a vault once:
-
-```sh
 docker compose run --rm vault init
 ```
 
-Choose a master password of 12–128 printable characters and confirm it. Password prompts
-stay blank while you type. A forgotten master password cannot be recovered.
+If you already have the project, open its folder and run the build command.
+Run `init` only to create a new vault; it refuses to overwrite an existing one.
+
+Choose and confirm a master password of 12–128 printable characters.
+Password prompts stay blank while you type. A forgotten master password cannot
+be recovered.
 
 ## Commands
 
@@ -42,34 +37,48 @@ stay blank while you type. A forgotten master password cannot be recovered.
 | `docker compose run --rm vault delete "Email"` | Delete after typing `yes` to confirm |
 | `docker compose run --rm vault --help` | Show help |
 
-For updates, press Enter to keep a field unchanged. There is no `--show` option
-or clipboard retrieval in checkpoint 2.
+For updates, press Enter to keep a field unchanged. There is no password reveal
+option or clipboard retrieval.
 
 Docker removes each container after the command, but keeps the encrypted vault
 in the `vault-data` volume. Keep the same project folder name to reuse it.
 Deleting that volume deletes the vault. Run one command at a time.
 
-## Checkpoint 2
+## How it works
 
-- **Storage and encryption:** the whole vault uses AES-256-GCM, with an
-  Argon2id key derived from the master password and a fresh nonce per save.
-- **Authentication:** wrong passwords or modified ciphertext fail verification
-  before any saved items are used.
-- **Interface:** passwords use hidden prompts and never appear in output.
-- **Submission:** include the source, Dockerfile, Compose file and
-  [progress note](docs/PROGRESS.md).
+1. You enter the master password through a hidden terminal prompt.
+2. Argon2id derives an encryption key from that password and a random salt.
+   The master password is not stored.
+3. AES-256-GCM decrypts the vault and checks its integrity. A wrong password
+   or changed encrypted data stops the command before any entries are used.
+4. Changes are encrypted with a fresh nonce (an encryption input), written to
+   a temporary file, then replace the old vault.
 
-The Docker image built successfully, and all 31 CLI checks passed inside the
-Linux container, including encryption, authentication and file permissions.
+Titles, login names and passwords are all encrypted. On Linux, the app also
+checks file ownership and private permissions. Python cannot guarantee erasure
+of passwords or keys from memory; memory handling still needs work.
 
-Password generation, clipboard support and master-password changes remain
-planned for checkpoint 3. Further details are in [the design](docs/DESIGN.md).
+The code follows the same flow: `cli.py` handles commands and prompts,
+`users.py` validates fields and coordinates operations, `crypto.py` handles
+encryption, and `storage.py` reads and writes the file. These are in `pwvault/`.
 
-## Checkpoint 3 work in progress
+## Progress
 
-The first part adds automated security tests and tightens master-password and
-decrypted JSON validation. Existing vaults keep the same file format.
-See [checkpoint 3 progress and remaining work](docs/CHECKPOINT3.md).
+Checkpoint 2 added the basic commands and encrypted storage. Its Docker build
+and 31 CLI checks passed; see the [checkpoint 2 note](docs/PROGRESS.md).
+
+Checkpoint 3 is **in progress**: validation fixes and automated tests are in
+place, with 20 tests passed and one POSIX test skipped on Windows. The updated
+Docker image still needs verification because the engine was unavailable.
+Logging, memory handling, access-control hardening and the report remain.
+Password generation, clipboard support and master-password changes are also
+planned, but are not explicit checkpoint 3 requirements.
+
+See [checkpoint 3 results and next steps](docs/CHECKPOINT3.md) and
+[the design and threat model](docs/DESIGN.md). For submission, include the source,
+Dockerfile, Compose file and documentation.
+
+## Run the tests
 
 Run the tests after rebuilding the Docker image:
 
@@ -92,4 +101,5 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
-On Linux/macOS, use `.venv/bin/python` for the last two commands.
+On Linux/macOS, use `python3` for the first command and `.venv/bin/python`
+for the last two commands.
