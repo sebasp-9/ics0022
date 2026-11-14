@@ -36,6 +36,16 @@ def encrypt(key, salt, items):
     return encrypted
 
 
+def unique_object(pairs):
+    # Reject ambiguous titles/fields instead of silently keeping the last value.
+    result = {}
+    for name, value in pairs:
+        if name in result:
+            raise ValueError("Duplicate JSON name")
+        result[name] = value
+    return result
+
+
 def unlock(data, password):
     if not HEADER.size + 16 <= len(data) <= MAX_FILE_SIZE:
         raise VaultError("The vault is incomplete or too large.", 3)
@@ -52,7 +62,7 @@ def unlock(data, password):
         # Authentication cannot distinguish a wrong password from changed data.
         raise VaultError("Wrong master password or modified vault. Nothing was changed.", 2) from None
     try:
-        items = json.loads(plaintext)
+        items = json.loads(plaintext, object_pairs_hook=unique_object)
     except (ValueError, UnicodeError, RecursionError):
         raise VaultError("The decrypted vault format is invalid.", 3) from None
     return key, salt, items

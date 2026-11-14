@@ -28,7 +28,7 @@ Create a vault once:
 docker compose run --rm vault init
 ```
 
-Choose a master password of 12–128 characters and confirm it. Password prompts
+Choose a master password of 12–128 printable characters and confirm it. Password prompts
 stay blank while you type. A forgotten master password cannot be recovered.
 
 ## Commands
@@ -64,3 +64,32 @@ Linux container, including encryption, authentication and file permissions.
 
 Password generation, clipboard support and master-password changes remain
 planned for checkpoint 3. Further details are in [the design](docs/DESIGN.md).
+
+## Checkpoint 3 work in progress
+
+The first part adds automated security tests and tightens master-password and
+decrypted JSON validation. Existing vaults keep the same file format.
+See [checkpoint 3 progress and remaining work](docs/CHECKPOINT3.md).
+
+Run the tests after rebuilding the Docker image:
+
+```sh
+docker compose build
+docker compose run --rm --entrypoint python vault -m unittest discover -s tests -v
+```
+
+Tests use disposable vaults and fictional passwords. They do not open your
+normal vault. Password prompts are simulated; real terminal behavior still
+needs a manual check. The POSIX permissions test runs on Linux and is skipped
+on Windows.
+
+For development without Docker, install Python 3.12 or newer, then run from
+the project directory on Windows:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e .
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+```
+
+On Linux/macOS, use `.venv/bin/python` for the last two commands.

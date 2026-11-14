@@ -10,6 +10,8 @@ COPY pyproject.toml .
 COPY pwvault/ pwvault/
 RUN pip install --no-cache-dir .
 
+COPY tests/ tests/
+
 RUN useradd --create-home --user-group --uid 10001 app \
     && mkdir -p /home/app/.pwvault \
     && chown app:app /home/app/.pwvault \

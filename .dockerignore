@@ -1,6 +1,8 @@
-# Only send the application and its package settings to Docker.
+# Only send the application, its tests and package settings to Docker.
 *
 !Dockerfile
 !pyproject.toml
 !pwvault/
 !pwvault/*.py
+!tests/
+!tests/*.py

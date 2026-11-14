@@ -13,8 +13,16 @@ def text_field(value, label, maximum=200):
 
 def master_password(value, new=False):
     minimum = 12 if new else 1
-    if not minimum <= len(value) <= 128:
+    if not isinstance(value, str) or not minimum <= len(value) <= 128:
         raise VaultError("The master password must contain " + str(minimum) + "–128 characters.")
+    try:
+        value.encode("utf-8")
+    except UnicodeEncodeError:
+        raise VaultError("The master password must contain valid Unicode text.") from None
+    # New passwords follow the terminal-safe field policy. Keep old passwords
+    # usable: checkpoint 2 allowed control characters when creating a vault.
+    if new and not value.isprintable():
+        raise VaultError("A new master password must contain only printable characters.")
     return value
 
 
